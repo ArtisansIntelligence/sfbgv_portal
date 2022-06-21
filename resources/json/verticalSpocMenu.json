@@ -1,0 +1,44 @@
+{
+    "menu": [
+        {
+            "url": "/dashboard",
+            "name": "Dashboard",
+            "i18n": "Dashboard",
+            "class": "waves-effect waves-cyan",
+            "slug": "dashboard",
+            "icon": "settings_input_svideo",
+            "tagcustom": "badge pill orange float-right mr-10"
+        },
+        {
+            "navheader": "Candidate",
+            "icon": "more_horiz"
+        },
+        {
+            "url": "candidates",
+            "name": "Candidate list",
+            "i18n": "Candidate List",
+            "class": "waves-effect waves-cyan",
+            "icon": "format_list_bulleted",
+            "slug": "candidates",
+            "tagcustom": "new badge pill pink accent-2 float-right mr-2"
+        },
+        {
+            "url": "create-case",
+            "name": "Add case",
+            "i18n": "Add case",
+            "class": "waves-effect waves-cyan",
+            "icon": "mail_outline",
+            "slug": "create-case",
+            "tagcustom": "new badge pill pink accent-2 float-right mr-2"
+        },
+        {
+            "url": "candidate-form",
+            "name": "Candidate Tokanize URL",
+            "i18n": "Candidate Tokanize URL",
+            "class": "waves-effect waves-cyan",
+            "icon": "mail_outline",
+            "slug": "candidate-form",
+            "tagcustom": "new badge pill pink accent-2 float-right mr-2"
+        }
+    ]
+}

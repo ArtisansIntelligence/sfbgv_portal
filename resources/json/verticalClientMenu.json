@@ -1,0 +1,13 @@
+{
+    "menu": [
+        {
+            "url": "/dashboard",
+            "name": "Dashboard",
+            "i18n": "Dashboard",
+            "class": "waves-effect waves-cyan",
+            "slug": "dashboard",
+            "icon": "settings_input_svideo",
+            "tagcustom": "badge pill orange float-right mr-10"
+        }
+    ]
+}

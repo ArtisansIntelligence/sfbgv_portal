@@ -2,14 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Address;
 use App\Models\Grade;
+use App\Models\Address;
 use App\Models\Candidate;
-use App\Models\CandidateCase;
-use App\Models\Qualification;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use App\Models\CandidateCase;
+use App\Models\Qualification;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use PhpParser\Node\Expr\FuncCall;
 
 class CandidateController extends Controller
 {
@@ -35,11 +37,15 @@ class CandidateController extends Controller
         return view('pages.candidate.list', ['breadcrumbs' => $breadcrumbs, 'pageConfigs' => $pageConfigs, 'candidates' => $candidates]);
     }
 
+    public function getGrade(Request $request)
+    {
+        if ($request->ajax()) {
+            return response()->json(['grades' => Grade::pluck('id', 'name')->all()]);
+        }
+    }
+
     public function store(Request $request)
     {
-        // $allExperiences = $request->experience;
-        // return response()->json($request->experience);
-
         $validatedCandidate = Validator::make($request->candidate, [
             'client_ref_id' => 'required',
             'employee_id' => 'required|numeric',
@@ -58,6 +64,23 @@ class CandidateController extends Controller
             'passport_no' => 'required|numeric',
             'pancard_no' => 'required|numeric',
             'aadharcard_no' => 'required|numeric',
+        ], [], [
+            'client_ref_id' => 'Client Ref Number',
+            'employee_id' => 'Employee Code',
+            'sf_ref_no' => 'SF Ref Number',
+            'name' => 'Candidate Full Name',
+            'father_name' => 'Candidate Father Name',
+            'gender' => 'Gender',
+            'dob' => 'Date of Birth',
+            'doj' => 'Date of Joining',
+            'mobile' => 'Mobile',
+            'email' => 'Email',
+            'zone' => 'Zone',
+            'business_unit' => 'Business Unit',
+            'grade' => 'Grade',
+            'passport_no' => 'Passport number',
+            'pancard_no' => 'Pancard number',
+            'aadharcard_no' => 'Aadhar card number',
         ]);
 
         if ($validatedCandidate->fails()) {
@@ -99,6 +122,24 @@ class CandidateController extends Controller
 
         if ($validatedAddress && $validatedCandidate && $validatedQualification) {
 
+            if (!$request->is_fresher) {
+                $validatedExperience = Validator::make($request->experience, [
+                    'employment.*.employer_name' => 'required',
+                    'employment.*.empl_no' => 'required',
+                    'employment.*.dol' => 'required',
+                    'employment.*.doj' => 'required',
+                    'employment.*.designation' => 'required',
+                    'employment.*.grade' => 'required',
+                    'employment.*.reason_of_leaving' => 'required',
+                    'employment.*.manager_name' => 'required',
+                    'employment.*.manager_no' => 'required|numeric',
+
+                ]);
+                if ($validatedExperience->fails()) {
+                    return response()->json(['errors' => $validatedExperience->getMessageBag()->toArray()], 422);
+                }
+            }
+
             // $validatedCandidate['image'] = $this->candidateFiles(request: $request, directory: "client", name: "image");
             $newCandidateId = Candidate::create(array_merge($request->candidate, ['updated_by' => 1, 'created_by' => 1]))->id;
             $candidateAddress = $request->address;
@@ -121,21 +162,17 @@ class CandidateController extends Controller
                 'updated_by' => 1,
                 'created_by' => 1
             ]);
-            // if ($newQualification) {
-            //     return response()->json(['message' => 'new qual created']);
-            // } else {
-            //     return response()->json(['message' => 'qual creation failed Failed']);
-            // }
-            // if (!$request->is_fresher) {
-            //     $allExperience = $request->experience;
-            // }
 
+            if (!$request->is_fresher) {
+                $allExperiences = $request->experience['employment'];
+                foreach ($allExperiences as $experience) {
+                    DB::table('candidates_employment')->insert([
+                        array_merge($experience, ['candidate_id' => $newCandidateId, 'created_by' => 1, 'updated_by' => 1])
+                    ]);
+                }
+            }
+            return response()->json(['message' => 'Generated candidate successfully']);
         }
-
-        if (!$newCandidateId) {
-            return response()->json(['message' => 'Some error occurred with insert query']);
-        }
-        return response()->json(['message' => 'Generated candidate successfully']);
     }
 
     public function candidateFiles($request, $directory, $name)
@@ -146,10 +183,6 @@ class CandidateController extends Controller
         $fileName = str($request->client_ref_id . '-' . $request->name)->slug('-', 'en') . '.' . $request->$name->extension();
         $filePath = $request->file($name)->move(public_path($directory), $fileName);
         return ($filePath) ?  $directory . '/' . $fileName : 'Failure';
-    }
-
-    public function uploadFiles()
-    {
     }
 
     public function createCase()

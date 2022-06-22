@@ -412,6 +412,7 @@
     $('#clickBtn').attr('disabled',checked);
     if(checked) {
       $('#experience_row').empty();
+      id = 1;
     } 
   }
 
@@ -479,6 +480,34 @@
      return container.append(uploadBtn,filePathWrapper);
   }
 
+  function generateSelectInput(name,label)
+  {
+    var container = jQuery('<div>',{
+        'class': 'input-field col m4 s12'
+     });
+    
+     var select = jQuery('<select>',{
+        'name' : `${name}_${id}`,
+     }).append(`<option disabled selected>${label}</option>`);
+
+     $.ajax({
+      url:'{{route("getGrade")}}',
+      method: 'GET',
+      success:function(result){
+        const grades = result.grades;
+        Object.entries(grades).forEach(grade => {
+        select.append(`<option value="${grade[1]}">${grade[0]}</option>`);
+        });
+      }
+     });
+
+     var selectLabel = jQuery('<label>',{
+      'for' : `${name}_${id}`,
+     }).append(document.createTextNode(label));
+
+     return container.append(select,selectLabel);
+  }
+
   // Document Ready
   $(document).ready(function()
   {
@@ -513,9 +542,10 @@
       const dateOfLeave = generateDateInput('emp_dol','Date of Leaving');
       const lastDesignation = generateTextInput('last_designation','Last Designation');
       const grade = generateTextInput('emp_grade','Grade');
+      // const grade = generateSelectInput('emp_grade','Select Grade');
       const empReason = generateTextInput('emp_reason','Employee Resignation Reason');
       const reportingManagerName = generateTextInput('emp_manager_name','Reporting Mangager Name');
-      const reportingManagerNo = generateTextInput('emp_manager_no','Reporting Mangager Number');
+      const reportingManagerNo = generateTextInput('emp_manager_no','Reporting Mangager Phone Number');
       const resignationLetter = generateFileInput('Resignation Letter','emp_resignationletter');
       const appointmentLetter = generateFileInput('Appointment Letter','emp_appointmentletter');
       const salarySlip = generateFileInput('Salary Slips','emp_salaryslip');
@@ -636,6 +666,7 @@
       let manager_no = row.children[9].children['emp_manager_no'+id].value;
       // console.log(employer_name,empl_no,doj,dol,designation,grade,reason_of_leaving,manager_name,manager_no);
       data.push({employer_name,empl_no,doj,dol,designation,grade,reason_of_leaving,manager_name,manager_no});
+      
     });
     // console.log(JSON.stringify(data));
     // console.log(data); 
@@ -646,6 +677,7 @@
    }
   
   }
+
 
   // Form submit
   $(document).on('click','#btn-submit',function(e)
@@ -668,7 +700,7 @@
         is_fresher : is_fresher,
         candidate: candidate,
         address:address,
-        experience:experience,
+        experience:{employment:experience},
         education:education
       },
       success:function(result){
@@ -677,12 +709,13 @@
       error: function(error){
         if(error.status === 422)
         {
+          window.scrollTo(0, 0);
           $('#errors').show();
           $('#errors').empty();
           var errorList = jQuery('<ul>',{'class': 'center mb-5 lighten-5 red pt-2 pb-2'});
           $.each(error.responseJSON.errors, function (key, item) 
           {
-            errorList.append("<li class='red-text center pt-1'>"+item+"</li>")
+            errorList.append("<li class='red-text center pt-1'><small>"+item+"</small></li>")
           });
           $("#errors").append(errorList);
         }

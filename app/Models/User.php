@@ -13,7 +13,8 @@ class User extends Authenticatable
     use HasApiTokens, HasFactory, Notifiable;
 
     protected $primaryKey = 'user_id';
-
+    const CREATED_AT = 'created_dt';
+    const UPDATED_AT = 'updated_dt';
     /**
      * The attributes that are mass assignable.
      *
@@ -22,6 +23,10 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'username',
+        'role_id',
+        'created_by',
+        'updated_by',
         'password',
     ];
 

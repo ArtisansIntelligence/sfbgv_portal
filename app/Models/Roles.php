@@ -17,9 +17,9 @@ class Roles extends Authenticatable
      *
      * @var array<int, string>
      */
+    protected $primaryKey = 'role_id';
     protected $fillable = [
         'role_name',
         'is_active',
     ];
-
 }

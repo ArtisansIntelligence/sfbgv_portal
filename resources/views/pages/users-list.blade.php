@@ -78,7 +78,7 @@
                 <th>role</th>
                 <th>status</th>
                 <th>edit</th>
-                <th>view</th>
+                <th>delete</th>
               </tr>
             </thead>
             <tbody>
@@ -90,20 +90,23 @@
                 <td>{{$user->name}}</td>
                 <td>{{$user->email}}</td>
                 <td>
-                        @php $ind = array_search ($user->role_id, array_column (json_decode(json_encode($roles), true), 'role_id')); @endphp
-                        {{$roles[$ind]->role_name}}
+                  @php $ind = array_search ($user->role_id, array_column (json_decode(json_encode($roles), true),
+                  'role_id')); @endphp
+                  {{$roles[$ind]->role_name}}
                 </td>
                 <td>
-                    @if($user->status == 1)
-                    <span class="chip green lighten-5"><span class="green-text">Active</span></span>
-                    @elseif($user->status == 2)
-                    <span class="chip red lighten-5"><span class="red-text">Banned</span></span>
-                    @else
-                    <span class="chip orange lighten-5"><span class="orange-text">Close</span></span>
-                    @endif
+                  @if($user->status == 1)
+                  <span class="chip green lighten-5"><span class="green-text">Active</span></span>
+                  @elseif($user->status == 2)
+                  <span class="chip red lighten-5"><span class="red-text">Banned</span></span>
+                  @else
+                  <span class="chip orange lighten-5"><span class="orange-text">Close</span></span>
+                  @endif
                 </td>
-                <td><a href="{{asset('users-edit')}}"><i class="material-icons">edit</i></a></td>
-                <td><a href="{{asset('users-view')}}"><i class="material-icons">remove_red_eye</i></a></td>
+                <td><a href="{{route('edituser',['id' => $user->user_id])}}"><i class="material-icons">edit</i></a></td>
+                <td><a href='javascript:void(0)' class="deleteUser" data-id="{{$user->user_id}}"><i
+                      class="material-icons">delete</i></a>
+                </td>
               </tr>
               @endforeach
             </tbody>
@@ -119,6 +122,7 @@
 
 {{-- vendor scripts --}}
 @section('vendor-script')
+
 <script src="{{asset('vendors/data-tables/js/jquery.dataTables.min.js')}}"></script>
 <script src="{{asset('vendors/data-tables/extensions/responsive/js/dataTables.responsive.min.js')}}"></script>
 @endsection
@@ -126,4 +130,58 @@
 {{-- page script --}}
 @section('page-script')
 <script src="{{asset('js/scripts/page-users.js')}}"></script>
+<script src="{{asset('vendors/sweetalert/sweetalert.min.js')}}"></script>
+<script>
+  $(document).ready(function () {
+      $(document).on('click','.deleteUser',function(e) {
+          var _token = '{{ csrf_token() }}';
+          const id = $(this).attr('data-id');
+          swal({
+              title: "Are you sure?",
+              text: "You will not be able to recover Department from system",
+              icon: 'warning',
+              // dangerMode: true,
+              buttons: {
+                  cancel: 'No, Please!',
+                  delete: 'Yes, Delete It'
+              }
+          }).then(function (willDelete) {
+              if (willDelete) {
+                  $.ajax({
+                      url: '{{ route("deleteuser") }}',
+                      type: 'DELETE',
+                      data: {
+                          _token: _token,
+                          id : id,
+                      },
+                      success: function(result) {
+                        // $("#users-list-datatable").DataTable().ajax.reload();
+                          swal(result.message, {
+                              icon: "success",
+                              buttons:false,
+                              timer: 1000,
+                          });
+                          
+                      },
+                      error: function(err) {
+                          swal('Failed to Delete', {
+                              icon: "error",
+                          });
+                      }
+                  });
+                  } 
+          });
+         
+      });
+  });
+
+  @if (session()->has('message'))
+  M.Toast.dismissAll();
+  M.toast({
+          html: '{{session()->get("message")}}',   
+          classes:'teal darken-1',
+          });
+  @endif
+     
+</script>
 @endsection

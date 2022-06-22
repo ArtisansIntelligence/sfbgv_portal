@@ -1,27 +1,28 @@
 <?php
 
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\CssController;
+use App\Http\Controllers\CardController;
+use App\Http\Controllers\FormController;
+use App\Http\Controllers\MiscController;
+use App\Http\Controllers\PageController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\ChartController;
+use App\Http\Controllers\MediaController;
+use App\Http\Controllers\ClientController;
+use App\Http\Controllers\BasicUiController;
 use App\Http\Controllers\LanguageController;
+use App\Http\Controllers\AdvanceUiController;
+use App\Http\Controllers\CandidateController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DataTableController;
+use App\Http\Controllers\BasicTableController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\UserProfileController;
-use App\Http\Controllers\PageController;
-use App\Http\Controllers\MediaController;
-use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthenticationController;
-use App\Http\Controllers\MiscController;
-use App\Http\Controllers\CardController;
-use App\Http\Controllers\CssController;
-use App\Http\Controllers\BasicUiController;
-use App\Http\Controllers\AdvanceUiController;
 use App\Http\Controllers\ExtraComponentsController;
-use App\Http\Controllers\BasicTableController;
-use App\Http\Controllers\DataTableController;
-use App\Http\Controllers\FormController;
-use App\Http\Controllers\ChartController;
-use App\Http\Controllers\ClientController;
-use App\Http\Controllers\CandidateController;
-use Illuminate\Http\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -46,17 +47,19 @@ Route::post('/add-client', [ClientController::class, 'addClient'])->middleware('
 Route::post('/update-client', [ClientController::class, 'updateClient'])->middleware('auth');
 Route::post('/delete-client', [ClientController::class, 'deleteClient'])->middleware('auth');
 
-Route::get('/users', [UserController::class, 'usersList']);
+Route::get('/users', [UserController::class, 'usersList'])->name('userlist');
 Route::get('/create-user', [UserController::class, 'createUser']);
-Route::post('/add-user', [UserController::class, 'addUser']);
-Route::post('/update-user', [UserController::class, 'updateUser']);
-Route::post('/delete-user', [UserController::class, 'deleteUser']);
+Route::post('/add-user', [UserController::class, 'addUser'])->name('adduser');
+Route::get('/users/{id?}/edit', [UserController::class, 'usersEdit'])->name('edituser');
+Route::post('/update-user', [UserController::class, 'updateUser'])->name('updateuser');
+Route::delete('/delete-user', [UserController::class, 'deleteUser'])->name('deleteuser');
 
 Route::get('candidates', [CandidateController::class, 'getCandidates'])->name('candidate.list');
 Route::get('create-case', [CandidateController::class, 'createCase'])->name('candidate.case');
 Route::post('add-case', [CandidateController::class, 'addCase'])->name('candidate.add-case');
 // Route::get('/candidate', [CandidateController::class, 'index'])->name('nocv');
 // Route::post('/candidate', [CandidateController::class, 'store'])->name('cv-post');
+Route::get('/getGrade', [CandidateController::class, 'getGrade'])->name('getGrade');
 Route::get('/candidate-form', [CandidateController::class, 'index'])->name('nocv');
 Route::post('/candidate-form', [CandidateController::class, 'store'])->name('cv-post');
 

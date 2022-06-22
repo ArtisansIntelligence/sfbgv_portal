@@ -34,13 +34,13 @@
           </a>
         </li>
       </ul> -->
-      <div class="divider mb-3"></div>
+      {{-- <div class="divider mb-3"></div> --}}
       <div class="row">
         <div class="col s12" id="account">
           <!-- users edit media object start -->
           <!-- <div class="media display-flex align-items-center mb-2">
             <a class="mr-2" href="#">
-              <img src="{{asset('images/avatar/avatar-11.png')}}" alt="users avatar" class="z-depth-4 circle"
+              {{-- <img src="{{asset('images/avatar/avatar-11.png')}}" alt="users avatar" class="z-depth-4 circle" --}}
                 height="64" width="64">
             </a>
             <div class="media-body">
@@ -53,36 +53,53 @@
           </div> -->
           <!-- users edit media object ends -->
           <!-- users edit account form start -->
-          <form id="accountForm">
+          <form id="accountForm" method="POST" action="{{route('adduser')}}">
+            @csrf
+            <div class="row">
+              @if ($errors->any())
+              <div class="red lighten-4">
+                <ul class="p-2">
+                  @foreach ($errors->all() as $error)
+                  <li class="text-red">{{ $error }}</li>
+                  @endforeach
+                </ul>
+              </div>
+              @endif
+            </div>
             <div class="row">
               <div class="col s12 m6">
                 <div class="row">
                   <div class="col s12 input-field">
-                    <input id="username" name="username" type="text" class="validate" value="dean3004"
-                      data-error=".errorTxt1">
+                    <input id="username" name="username" type="text" class="validate">
                     <label for="username">Username</label>
-                    <small class="errorTxt1"></small>
                   </div>
                   <div class="col s12 input-field">
-                    <input id="name" name="name" type="text" class="validate" value="Dean Stanley"
-                      data-error=".errorTxt2">
+                    <input id="name" name="name" type="text" class="validate" data-error=".errorTxt2">
                     <label for="name">Name</label>
                     <small class="errorTxt2"></small>
                   </div>
                   <div class="col s12 input-field">
-                    <input id="email" name="email" type="email" class="validate" value="deanstanley@gmail.com"
-                      data-error=".errorTxt3">
-                    <label for="email">E-mail</label>
-                    <small class="errorTxt3"></small>
+                    <input id="password" name="password" type="password" class="validate">
+                    <label for="password">Password</label>
                   </div>
+                  <div class="col s12 input-field">
+                    <input id="confirmpassword" name="confirmpassword" type="password" class="validate">
+                    <label for="confirmpassword">Confirm Password</label>
+                  </div>
+
                 </div>
               </div>
               <div class="col s12 m6">
                 <div class="row">
                   <div class="col s12 input-field">
-                    <select name="role" id="role">
+                    <input id="email" name="email" type="email" class="validate" data-error=".errorTxt3">
+                    <label for="email">E-mail</label>
+                    <small class="errorTxt3"></small>
+                  </div>
+                  <div class="col s12 input-field">
+                    <select name="role_id" id="role_id">
                       @foreach($roles as $role)
-                        <option value="{{$role->role_id}}">{{$role->role_name}}</option>
+                      <option value="{{$role->role_id}}">{{$role->role_name}}</option>
                       @endforeach
                     </select>
                     <label>Role</label>
@@ -90,7 +107,7 @@
                   <div class="col s12 input-field">
                     <select name="client" id="client">
                       @foreach($clientsData as $client)
-                        <option value="{{$client->client_id}}">{{$client->client_name}}</option>
+                      <option value="{{$client->client_id}}">{{$client->client_name}}</option>
                       @endforeach
                     </select>
                     <label>Client</label>
